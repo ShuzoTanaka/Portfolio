@@ -51,13 +51,6 @@ flowchart TD
     E --> F[ZIPダウンロード]
 ```
 
-### アーキテクチャ
-
-- [クラウドアーキテクチャ図](https://ShuzoTanaka.github.io/Portfolio/cloud_architecture.html)
-- [品質管理フロー図](https://ShuzoTanaka.github.io/Portfolio/quality_check_diagram.html)
-
-> 図はGitHub Pagesで公開しています。
-
 ### 主な技術的チャレンジ
 
 - **Python 3.11固定**: MRtrix3 3.0.4が`import imp`を使用（Python 3.12で廃止）。バージョン管理を徹底。
