@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #ffffff;
+    font-family: "Hiragino Sans", "Yu Gothic", "Meiryo", sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 40px;
+  }
+
+  .diagram {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    width: 640px;
+  }
+
+  /* ========== ノード ========== */
+  .node {
+    width: 100%;
+    padding: 20px 30px;
+    border-radius: 14px;
+    text-align: center;
+  }
+
+  .node-user {
+    background: #EBF4FF;
+    border: 2.5px solid #3B82F6;
+  }
+
+  .node-server {
+    background: #F0FDF4;
+    border: 2.5px solid #22C55E;
+    width: 100%;
+    padding: 24px 30px;
+    border-radius: 14px;
+  }
+
+  .node-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: #1E293B;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .node-sub {
+    font-size: 16px;
+    color: #475569;
+  }
+
+  .badge {
+    font-size: 14px;
+    font-weight: 600;
+    padding: 4px 14px;
+    border-radius: 20px;
+    display: inline-block;
+  }
+  .badge-blue  { background: #3B82F6; color: #fff; }
+  .badge-green { background: #22C55E; color: #fff; }
+
+  /* ========== 矢印 ========== */
+  .arrow-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    position: relative;
+    width: 100%;
+  }
+
+  .arrow-label {
+    font-size: 15px;
+    font-weight: 600;
+    color: #64748B;
+    background: #fff;
+    border: 1.5px solid #CBD5E1;
+    border-radius: 20px;
+    padding: 6px 18px;
+    z-index: 1;
+    white-space: nowrap;
+  }
+
+  .arrow-down {
+    width: 0;
+    height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-top: 14px solid #94A3B8;
+  }
+
+  .arrow-up {
+    width: 0;
+    height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-bottom: 14px solid #94A3B8;
+  }
+
+  .arrow-line {
+    width: 2.5px;
+    height: 18px;
+    background: #94A3B8;
+  }
+
+  /* ========== サーバー内部 ========== */
+  .server-label {
+    font-size: 17px;
+    font-weight: 700;
+    color: #16A34A;
+    text-align: left;
+    margin-bottom: 14px;
+    letter-spacing: 0.04em;
+  }
+
+  .server-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .step {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: #fff;
+    border: 1.5px solid #BBF7D0;
+    border-radius: 10px;
+    padding: 10px 16px;
+  }
+
+  .step-icon {
+    font-size: 28px;
+    flex-shrink: 0;
+  }
+
+  .step-text {
+    text-align: left;
+  }
+
+  .step-title {
+    font-size: 17px;
+    font-weight: 700;
+    color: #1E293B;
+  }
+
+  .step-desc {
+    font-size: 14px;
+    color: #64748B;
+    margin-top: 2px;
+  }
+
+  .step-arrow {
+    font-size: 20px;
+    color: #94A3B8;
+    text-align: center;
+    margin: 0 0 0 16px;
+  }
+
+  /* ========== アイコン ========== */
+  .icon { font-size: 34px; }
+</style>
+</head>
+<body>
+<div class="diagram">
+
+  <!-- ユーザーPC（上） -->
+  <div class="node node-user">
+    <div class="node-title">
+      <span class="icon">💻</span>
+      ユーザーのPC（ブラウザ）
+    </div>
+    <div class="node-sub">どこからでもアクセス可能</div>
+    <div style="margin-top:8px">
+      <span class="badge badge-blue">DICOMファイルを選択・アップロード</span>
+    </div>
+  </div>
+
+  <!-- 矢印 下 -->
+  <div class="arrow-block">
+    <div class="arrow-line"></div>
+    <div class="arrow-label">📤 DICOMアップロード（インターネット経由）</div>
+    <div class="arrow-line"></div>
+    <div class="arrow-down"></div>
+  </div>
+
+  <!-- クラウドサーバー -->
+  <div class="node-server">
+    <div class="server-label">☁️ &nbsp;クラウドサーバー</div>
+    <div class="server-steps">
+
+      <div class="step">
+        <div class="step-icon">🖥️</div>
+        <div class="step-text">
+          <div class="step-title">Streamlit（UI・ジョブ受付）</div>
+          <div class="step-desc">ファイル受信・処理の開始・結果の返却</div>
+        </div>
+      </div>
+
+      <div class="step-arrow">↓</div>
+
+      <div class="step">
+        <div class="step-icon">🤖</div>
+        <div class="step-text">
+          <div class="step-title">UNet ResNet34【AI】</div>
+          <div class="step-desc">腰椎ROIセグメンテーション（dcm2niix → マスク生成）</div>
+        </div>
+      </div>
+
+      <div class="step-arrow">↓</div>
+
+      <div class="step">
+        <div class="step-icon">⚙️</div>
+        <div class="step-text">
+          <div class="step-title">MRtrix3パイプライン</div>
+          <div class="step-desc">FOD計算 → Tractography生成 → DTI指標（FA/MD/RD）</div>
+        </div>
+      </div>
+
+      <div class="step-arrow">↓</div>
+
+      <div class="step">
+        <div class="step-icon">📊</div>
+        <div class="step-text">
+          <div class="step-title">Plotly Scatter3d（3D描画）</div>
+          <div class="step-desc">WebGLデータをブラウザへ送信</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 矢印 上 -->
+  <div class="arrow-block">
+    <div class="arrow-up"></div>
+    <div class="arrow-line"></div>
+    <div class="arrow-label">📥 3D描画データを返す（インターネット経由）</div>
+    <div class="arrow-line"></div>
+  </div>
+
+  <!-- ユーザーPC（下） -->
+  <div class="node node-user">
+    <div class="node-title">
+      <span class="icon">💻</span>
+      ユーザーのPC（ブラウザ）
+    </div>
+    <div class="node-sub">ブラウザ上でインタラクティブ3D表示</div>
+    <div style="margin-top:8px">
+      <span class="badge badge-blue">FA Tractography 3Dビューアー</span>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

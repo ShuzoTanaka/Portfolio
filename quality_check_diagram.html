@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #ffffff;
+    font-family: "Hiragino Sans", "Yu Gothic", "Meiryo", sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    padding: 48px 40px;
+  }
+
+  .diagram {
+    position: relative;
+    width: 820px;
+  }
+
+  /* ===== 上段：横フロー ===== */
+  .top-flow {
+    display: flex;
+    align-items: center;
+    width: 100%;
+  }
+
+  .flow-node {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 14px 16px;
+    border-radius: 12px;
+    flex-shrink: 0;
+  }
+  .node-blue   { background:#EFF6FF; border:2.5px solid #3B82F6; width:118px; min-height:74px; }
+  .node-yellow { background:#FFFBEB; border:2.5px solid #F59E0B; width:148px; min-height:74px; }
+  .node-green  { background:#F0FDF4; border:2.5px solid #22C55E; width:130px; min-height:74px; }
+
+  .node-icon  { font-size:22px; margin-bottom:4px; }
+  .node-title { font-size:14px; font-weight:700; color:#1E293B; line-height:1.3; }
+  .node-sub   { font-size:11px; color:#64748B; margin-top:2px; }
+
+  /* 横矢印 */
+  .arr-r { display:flex; align-items:center; flex:1; padding:0 2px; }
+  .arr-r-line { flex:1; height:2.5px; background:#94A3B8; }
+  .arr-r-head { width:0;height:0;border-top:8px solid transparent;border-bottom:8px solid transparent;border-left:11px solid #94A3B8;flex-shrink:0; }
+
+  /* 緑の横矢印（✅通過） */
+  .arr-pass { display:flex; flex-direction:column; align-items:stretch; gap:3px; flex:1; padding:0 2px; }
+  .pass-label { font-size:11px;font-weight:700;color:#16A34A;background:#DCFCE7;border:1.5px solid #86EFAC;border-radius:20px;padding:2px 10px;align-self:center;white-space:nowrap; }
+  .arr-pass-row { display:flex; align-items:center; }
+  .arr-pass-line { flex:1; height:2.5px; background:#22C55E; }
+  .arr-pass-head { width:0;height:0;border-top:8px solid transparent;border-bottom:8px solid transparent;border-left:11px solid #22C55E;flex-shrink:0; }
+
+  /* ===== 縦矢印（品質チェック → 下） ===== */
+  .v-arrow {
+    display:flex; flex-direction:column; align-items:center;
+    margin-left: 302px;
+  }
+  .v-line { width:2.5px; height:18px; background:#F59E0B; }
+  .v-head { width:0;height:0;border-left:8px solid transparent;border-right:8px solid transparent;border-top:11px solid #F59E0B; }
+
+  /* ===== 下段 ===== */
+  .bottom-section {
+    display:flex; align-items:center;
+    margin-left: 230px;
+    gap: 0;
+  }
+
+  .checks-box {
+    flex:1;
+    background:#FFFBEB; border:2px solid #F59E0B;
+    border-radius:12px; padding:14px 18px;
+    display:flex; flex-direction:column; gap:10px;
+  }
+  .check-row-inner { display:flex; align-items:center; gap:8px; }
+  .chip-icon  { font-size:14px; flex-shrink:0; }
+  .chip-title { font-size:13px; font-weight:700; color:#92400E; }
+  .chip-cond  { font-size:11px; color:#B45309; margin-top:1px; }
+
+  .result-col { display:flex; align-items:center; flex-shrink:0; padding:0 4px; }
+  .arr-sm { display:flex; align-items:center; gap:4px; }
+  .arr-sm-line { width:28px; height:2.5px; background:#94A3B8; }
+  .arr-sm-head { width:0;height:0;border-top:7px solid transparent;border-bottom:7px solid transparent;border-left:10px solid #94A3B8; }
+
+  .outcome-col { display:flex; align-items:center; flex-shrink:0; }
+  .warn-box {
+    background:#FEF2F2; border:2px solid #EF4444;
+    border-radius:10px; padding:12px 16px;
+    text-align:center; min-width:110px;
+  }
+  .warn-title { font-size:15px; font-weight:700; color:#DC2626; }
+
+  /* ===== SVGオーバーレイ ===== */
+  #connector-svg {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    overflow: visible;
+  }
+</style>
+</head>
+<body>
+<div class="diagram" id="diagram">
+
+  <!-- SVGコネクター（JS で描画） -->
+  <svg id="connector-svg"></svg>
+
+  <!-- 上段：横フロー -->
+  <div class="top-flow">
+    <div class="flow-node node-blue">
+      <div class="node-icon">📁</div>
+      <div class="node-title">DICOM</div>
+      <div class="node-sub">入力データ</div>
+    </div>
+    <div class="arr-r"><div class="arr-r-line"></div><div class="arr-r-head"></div></div>
+    <div class="flow-node node-blue">
+      <div class="node-icon">🔄</div>
+      <div class="node-title">NIfTI変換</div>
+      <div class="node-sub">dcm2niix</div>
+    </div>
+    <div class="arr-r"><div class="arr-r-line"></div><div class="arr-r-head"></div></div>
+    <div class="flow-node node-yellow">
+      <div class="node-icon">🔍</div>
+      <div class="node-title">入力品質チェック</div>
+      <div class="node-sub">実装予定</div>
+    </div>
+    <div class="arr-pass">
+      <div class="pass-label">✅ チェック通過</div>
+      <div class="arr-pass-row">
+        <div class="arr-pass-line"></div>
+        <div class="arr-pass-head"></div>
+      </div>
+    </div>
+    <div class="flow-node node-green" id="stage2-box">
+      <div class="node-icon">⚙️</div>
+      <div class="node-title">Stage 2</div>
+      <div class="node-sub">FOD / Tractography</div>
+    </div>
+  </div>
+
+  <!-- 縦矢印 -->
+  <div class="v-arrow">
+    <div class="v-line"></div>
+    <div class="v-head"></div>
+  </div>
+
+  <!-- 下段 -->
+  <div class="bottom-section">
+    <div class="checks-box">
+      <div class="check-row-inner">
+        <div class="chip-icon">📐</div>
+        <div><div class="chip-title">グラジエント方向数</div><div class="chip-cond">6方向未満</div></div>
+      </div>
+      <div class="check-row-inner">
+        <div class="chip-icon">📊</div>
+        <div><div class="chip-title">b値の適正範囲</div><div class="chip-cond">500〜1500 s/mm² 範囲外</div></div>
+      </div>
+      <div class="check-row-inner">
+        <div class="chip-icon">📡</div>
+        <div><div class="chip-title">b0画像のSNR</div><div class="chip-cond">閾値未満</div></div>
+      </div>
+      <div class="check-row-inner">
+        <div class="chip-icon">🔲</div>
+        <div><div class="chip-title">スライスドロップアウト</div><div class="chip-cond">異常スライス検出</div></div>
+      </div>
+    </div>
+    <div class="result-col">
+      <div class="arr-sm">
+        <div class="arr-sm-line"></div>
+        <div class="arr-sm-head"></div>
+      </div>
+    </div>
+    <div class="outcome-col">
+      <div class="warn-box" id="warning-box">
+        <div class="warn-title">⚠️ 警告</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+window.addEventListener('load', function () {
+  const diagram  = document.getElementById('diagram');
+  const stage2   = document.getElementById('stage2-box');
+  const warning  = document.getElementById('warning-box');
+  const svg      = document.getElementById('connector-svg');
+
+  const dRect = diagram.getBoundingClientRect();
+  const s2    = stage2.getBoundingClientRect();
+  const w     = warning.getBoundingClientRect();
+
+  // 座標をdiagram基準に変換
+  const s2CenterX = s2.left - dRect.left + s2.width / 2;
+  const s2Bottom  = s2.bottom - dRect.top;
+  const wCenterX  = w.left - dRect.left + w.width / 2;
+  const wTop      = w.top  - dRect.top;
+
+  const ns = 'http://www.w3.org/2000/svg';
+
+  // 矢印マーカー（右向き基準、orient="auto" で上向きに回転）
+  const defs = document.createElementNS(ns, 'defs');
+  const marker = document.createElementNS(ns, 'marker');
+  marker.setAttribute('id', 'arr-up');
+  marker.setAttribute('markerWidth', '10');
+  marker.setAttribute('markerHeight', '8');
+  marker.setAttribute('refX', '10');
+  marker.setAttribute('refY', '4');
+  marker.setAttribute('orient', 'auto');
+  const poly = document.createElementNS(ns, 'polygon');
+  poly.setAttribute('points', '0,0 10,4 0,8');
+  poly.setAttribute('fill', '#22C55E');
+  marker.appendChild(poly);
+  defs.appendChild(marker);
+  svg.appendChild(defs);
+
+  // パス：警告の上辺中央 → Stage2のX位置まで短く水平 → Stage2の下辺まで垂直
+  const path = document.createElementNS(ns, 'path');
+  const d = `M ${wCenterX} ${wTop} L ${s2CenterX} ${wTop} L ${s2CenterX} ${s2Bottom}`;
+  path.setAttribute('d', d);
+  path.setAttribute('fill', 'none');
+  path.setAttribute('stroke', '#22C55E');
+  path.setAttribute('stroke-width', '2.5');
+  path.setAttribute('stroke-dasharray', '');
+  path.setAttribute('marker-end', 'url(#arr-up)');
+  svg.appendChild(path);
+});
+</script>
+</body>
+</html>

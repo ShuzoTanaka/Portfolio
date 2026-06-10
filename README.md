@@ -1,0 +1,77 @@
+# Portfolio — Shuzo Tanaka
+
+医療画像 × AI × Webアプリ開発のポートフォリオです。
+
+> **Note:** 研究・企業共同開発のプロジェクトのため、ソースコードはPrivateリポジトリで管理しています。  
+> このリポジトリはアーキテクチャ概要・技術ドキュメントを公開するためのものです。
+
+---
+
+## Project: 腰椎MRI Tractography Viewer
+
+### 概要
+
+腰椎拡散強調MRI（DWI/DTI）を入力とし、AIによるROI自動セグメンテーションから  
+Tractography・DTI指標の算出まで、ブラウザ上で完結するWebアプリケーションです。  
+医療機関との共同研究として開発中です。
+
+### Tech Stack
+
+![Python](https://img.shields.io/badge/Python-3.11-blue?logo=python)
+![Streamlit](https://img.shields.io/badge/Streamlit-1.x-red?logo=streamlit)
+![Docker](https://img.shields.io/badge/Docker-linux%2Famd64-blue?logo=docker)
+![PyTorch](https://img.shields.io/badge/PyTorch-2.x-orange?logo=pytorch)
+![MRtrix3](https://img.shields.io/badge/MRtrix3-3.0.4-green)
+
+| カテゴリ | 技術 |
+|---|---|
+| フロントエンド | Streamlit |
+| コンテナ | Docker / Docker Compose |
+| AI推論 | PyTorch・UNet ResNet34（セグメンテーション） |
+| MRI解析 | MRtrix3（FOD・Tractography・DTI指標） |
+| DICOM処理 | dcm2niix・pydicom |
+
+### 処理フロー
+
+```
+DICOMフォルダ
+    ↓ dcm2niix
+NIfTI変換
+    ↓ UNet ResNet34 (PyTorch)
+腰椎ROI自動セグメンテーション
+    ↓ MRtrix3 (dwi2fod / tckgen)
+FOD推定 → Tractography生成 (.tck)
+    ↓ MRtrix3 (dwi2tensor / tensor2metric)
+DTI指標算出（FA・MD・AD・RD）
+    ↓
+ZIPダウンロード
+```
+
+### アーキテクチャ
+
+詳細なアーキテクチャ図は以下のHTMLファイルを参照：
+
+- [クラウドアーキテクチャ図](cloud_architecture.html)
+- [品質管理フロー図](quality_check_diagram.html)
+
+### 主な技術的チャレンジ
+
+- **Python 3.11固定**: MRtrix3 3.0.4が`import imp`を使用（Python 3.12で廃止）。バージョン管理を徹底。
+- **マルチステージDockerビルド**: MRtrix3のC++コンパイル（30〜60分）をStage1に分離し、本番イメージを軽量化。
+- **ヘッドレス環境対応**: `opencv-python-headless`・VTK非表示環境でのパイプライン設計。
+- **Debian Trixieライブラリ問題**: `libfftw3-3`が`libfftw3-3t64`にリネームされた変更を`-dev`パッケージ経由で回避。
+- **DICOMメタデータ解析**: 患者情報・シリーズ判別のための堅牢なDICOM読み込み設計。
+
+---
+
+## Project: FiberFox（開発中）
+
+拡散MRIシミュレーションツール。  
+公開データセットやダミーデータを用いたパイプライン検証・デモ用途を目的として開発中。
+
+---
+
+## Contact
+
+- GitHub: [github.com/ShuzoTanaka](https://github.com/ShuzoTanaka)
+- Email: syu_syu_syu333@icloud.com
