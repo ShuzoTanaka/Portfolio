@@ -62,7 +62,7 @@ flowchart TD
 
 ---
 
-## Project: 3D U-Net 腰椎神経・脊髄セグメンテーション
+## Project: 腰椎神経・脊髄セグメンテーション
 
 **ソースコード公開中** → [github.com/ShuzoTanaka/3DU-Net](https://github.com/ShuzoTanaka/3DU-Net)
 
